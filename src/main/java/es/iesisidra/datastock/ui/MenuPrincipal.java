@@ -28,9 +28,11 @@ public class MenuPrincipal {
             System.out.println("5. Exportar productos");
             System.out.println("6. Guardar y recuperar inventario");
             System.out.println("0. Salir");
+
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 6);
+            
             switch (opcion) {
-                case 1 -> pendiente("RF-FIC-01 · Explorar ficheros y directorios");
+                case 1 -> inventario.explorarRuta();
                 case 2 -> pendiente("RF-FIC-02 · Importar productos desde JSON");
                 case 3 -> pendiente("RF-FIC-03 · Importar productos desde XML");
                 case 4 -> menuConsultas();
