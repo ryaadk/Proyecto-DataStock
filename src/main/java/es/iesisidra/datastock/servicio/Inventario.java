@@ -2,9 +2,18 @@ package es.iesisidra.datastock.servicio;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -13,6 +22,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import es.iesisidra.datastock.modelo.Producto;
+import es.iesisidra.datastock.repository.AlumnoXmlRepository;
 import es.iesisidra.datastock.util.LectorConsola;
 
 /**
@@ -94,7 +104,7 @@ public class Inventario {
     }
 
     private List<String> validarProducto(Producto p) {
-        List<String> errores = new ArrayList<String>();
+        List<String> errores = new ArrayList<>();
 
         // Validar codigo
         if (p.getCodigo() == null || p.getCodigo().trim().isEmpty()) {
@@ -155,6 +165,7 @@ public class Inventario {
 
     public void importarJson() {
         String entrada = LectorConsola.leerTexto("Ruta: ");
+        System.out.println();
 
         if (entrada == null || entrada.isEmpty()) {
             System.out.println("[ERROR] Debes introducir una ruta.");
@@ -248,6 +259,167 @@ public class Inventario {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    // FUncion para leer los 6 campos de XML
+    private String leerCampoXml(Element producto, String nombreCampo) {
+        NodeList campos = producto.getElementsByTagName(nombreCampo);
+
+        if (campos.getLength() == 0) {
+            return null;
+        }
+
+        return campos.item(0).getTextContent().trim();
+    }
+
+    public void importarXml() {
+        String entrada = LectorConsola.leerTexto("Ruta: ");
+        System.out.println();
+
+        if (entrada == null || entrada.isEmpty()) {
+            System.out.println("[ERROR] Debes introducir una ruta.");
+            return;
+        }
+
+        File fichero = new File(entrada);
+
+        if (!fichero.exists() || !fichero.isFile()) {
+            System.out.println("[ERROR] El fichero no existe/no es un fichero.");
+            return;
+        }
+
+        try {
+            // Leer el XML utilizando tu repositorio
+            AlumnoXmlRepository repositorio = new AlumnoXmlRepository();
+            Document documento = repositorio.leer(Path.of(entrada));
+
+            Element raiz = documento.getDocumentElement();
+
+            // Comprobar la raíz
+            if (!raiz.getTagName().equals("catalogo")) {
+                System.out.println("[ERROR] La raíz debe ser <catalogo>.");
+                return;
+            }
+
+            NodeList productosXml = raiz.getChildNodes();
+
+            int encontrados = 0;
+            int importados = 0;
+            int rechazados = 0;
+
+            List<String> incidencias = new ArrayList<>();
+
+            // Contar únicamente los elementos producto directos
+            // Comprueba si es un elemento XML y si la etiqueta igual a producto.
+            for (int i = 0; i < productosXml.getLength(); i++) {
+                if (productosXml.item(i) instanceof Element && ((Element) productosXml.item(i)).getTagName().equals("producto")) {
+                    encontrados++;
+                }
+            }
+
+            int numeroProducto = 0;
+
+            // Si el no es un elemento, hace un continue para volver a iterar otra vez
+            // Si no, coge los datos usando la funcion leerCampoXml
+            for (int i = 0; i < productosXml.getLength(); i++) {
+                if (!(productosXml.item(i) instanceof Element)) {
+                    continue;
+                }
+
+                Element elemento = (Element) productosXml.item(i);
+
+                if (!elemento.getTagName().equals("producto")) {
+                    continue;
+                }
+
+                numeroProducto++;
+
+                try {
+                    String codigo = leerCampoXml(elemento, "codigo");
+                    String nombre = leerCampoXml(elemento, "nombre");
+                    String precioTexto = leerCampoXml(elemento, "precio");
+                    String stockTexto = leerCampoXml(elemento, "stock");
+                    String categoriaTexto = leerCampoXml(elemento, "categoriaId");
+                    String proveedorTexto = leerCampoXml(elemento, "proveedorId");
+
+                    // Comprobar campos ausentes o vacíos antes de convertir
+                    // Hago esta comprobacion porque si pongo valores por default estaría funcionando el programa.
+                    // Con esto hago que el proceso "pete" si no hay un valor valido.
+                    if (precioTexto == null || precioTexto.isBlank()) {
+                        throw new IllegalArgumentException("El precio es obligatorio.");
+                    }
+
+                    if (stockTexto == null || stockTexto.isBlank()) {
+                        throw new IllegalArgumentException("El stock es obligatorio.");
+                    }
+
+                    if (categoriaTexto == null || categoriaTexto.isBlank()) {
+                        throw new IllegalArgumentException("El ID de categoría es obligatorio.");
+                    }
+
+                    if (proveedorTexto == null || proveedorTexto.isBlank()) {
+                        throw new IllegalArgumentException("El ID de proveedor es obligatorio.");
+                    }
+
+                    BigDecimal precio = new BigDecimal(precioTexto);
+                    int stock = Integer.parseInt(stockTexto);
+                    int categoriaId = Integer.parseInt(categoriaTexto);
+                    int proveedorId = Integer.parseInt(proveedorTexto);
+
+                    Producto producto = new Producto(codigo, nombre, precio, stock, categoriaId, proveedorId);
+
+                    // Usar las mismas validaciones que en JSON
+                    List<String> errores = validarProducto(producto);
+
+                    // Añadir producto y poner errores.
+                    if (errores.isEmpty()) {
+                        PRODUCTOS.add(producto);
+                        importados++;
+
+                    } else {
+                        rechazados++;
+                        
+                        // Agregar las incidencias a un ArrayList
+                        for (int j = 0; j < errores.size(); j++) {
+                            incidencias.add("Producto " + numeroProducto + ": " + errores.get(j) + ".");
+                        }
+                    }
+                    
+                    // Catch para cundo introduzca un valor no valido en el xml
+                } catch (IllegalArgumentException e) {
+                    rechazados++;
+                    incidencias.add("Producto " + numeroProducto + ": " + e.getMessage());
+                }
+            }
+
+            // Mostrar el resumen
+            System.out.println("\nIMPORTACIÓN DE PRODUCTOS");
+            System.out.println("--------------------------------------");
+            System.out.println("Productos encontrados: " + encontrados);
+            System.out.println("Productos importados: " + importados);
+            System.out.println("Productos rechazados: " + rechazados);
+            System.out.println("Incidencias:");
+
+            if (incidencias.isEmpty()) {
+                System.out.println("No hay incidencias.");
+
+            } else {
+                for (int i = 0; i < incidencias.size(); i++) {
+                    System.out.println("- " + incidencias.get(i));
+                }
+            }
+
+            System.out.println("Importación finalizada.");
+
+        } catch (ParserConfigurationException e) {
+            System.out.println("[ERROR] No se pudo configurar el analizador XML.");
+
+        } catch (SAXException e) {
+            System.out.println("[ERROR] El XML está mal formado o contiene DTD no permitidas.");
+            
+        } catch (IOException e) {
+            System.out.println("[ERROR] No se pudo leer el fichero.");
         }
     }
 }

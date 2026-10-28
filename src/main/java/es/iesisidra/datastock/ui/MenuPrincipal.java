@@ -33,8 +33,8 @@ public class MenuPrincipal {
             
             switch (opcion) {
                 case 1 -> inventario.explorarRuta();
-                case 2 -> pendiente("RF-FIC-02 · Importar productos desde JSON");
-                case 3 -> pendiente("RF-FIC-03 · Importar productos desde XML");
+                case 2 -> inventario.importarJson();
+                case 3 -> inventario.importarXml();
                 case 4 -> menuConsultas();
                 case 5 -> menuExportaciones();
                 case 6 -> menuSerializacion();
