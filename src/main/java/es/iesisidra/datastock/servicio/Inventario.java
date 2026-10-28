@@ -1,9 +1,13 @@
 package es.iesisidra.datastock.servicio;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -107,7 +111,7 @@ public class Inventario {
         }
     }
 
-    private List<String> validarProducto(Producto p) {
+    private List<String> validarProducto(Producto p, List<Producto> lista) {
         List<String> errores = new ArrayList<>();
 
         // Validar codigo
@@ -123,8 +127,8 @@ public class Inventario {
 
         boolean codigoDuplicado = false;
 
-        for (int i = 0; i < PRODUCTOS.size() && !codigoDuplicado; i++) {
-           if (PRODUCTOS.get(i).getCodigo() != null && PRODUCTOS.get(i).getCodigo().trim().equalsIgnoreCase(p.getCodigo().trim())) {
+        for (int i = 0; i < lista.size() && !codigoDuplicado; i++) {
+           if (lista.get(i).getCodigo() != null && lista.get(i).getCodigo().trim().equalsIgnoreCase(p.getCodigo().trim())) {
             codigoDuplicado = true;
 }
         }
@@ -217,7 +221,7 @@ public class Inventario {
                 try {
                     Producto producto = new Gson().fromJson(productos.get(i), Producto.class);
 
-                    List<String> errores = validarProducto(producto);
+                    List<String> errores = validarProducto(producto, PRODUCTOS);
 
                     if (errores.isEmpty()) {
                         PRODUCTOS.add(producto);
@@ -376,7 +380,7 @@ public class Inventario {
                     Producto producto = new Producto(codigo, nombre, precio, stock, categoriaId, proveedorId);
 
                     // Usar las mismas validaciones que en JSON
-                    List<String> errores = validarProducto(producto);
+                    List<String> errores = validarProducto(producto, PRODUCTOS);
 
                     // Añadir producto y poner errores.
                     if (errores.isEmpty()) {
@@ -748,6 +752,141 @@ public class Inventario {
             System.out.println("[ERROR] No se pudo crear el documento XML.");
         } catch (IOException | TransformerException e) {
             System.out.println("[ERROR] No se pudo guardar el fichero XML.");
+        }
+    }
+
+    public void guardarInventario() {
+        // Comprobar si el inventario está vacío
+        if (PRODUCTOS.isEmpty()) {
+            System.out.println("[ERROR] El inventario está vacío.");
+            return;
+        }
+
+        // Solicitar la ruta del fichero
+        String entrada = LectorConsola.leerTexto("Ruta del fichero: ");
+
+        if (entrada == null || entrada.isBlank()) {
+            System.out.println("[ERROR] Debes introducir una ruta.");
+            return;
+        }
+
+        File fichero = new File(entrada);
+        File directorio = fichero.getAbsoluteFile().getParentFile();
+
+        // Comprobar si existe el directorio
+        if (directorio == null || !directorio.exists() || !directorio.isDirectory()) {
+            System.out.println("[ERROR] El directorio de destino no existe.");
+            return;
+        }
+
+        // Comprobar si la ruta es un directorio
+        if (fichero.isDirectory()) {
+            System.out.println("[ERROR] La ruta corresponde a un directorio.");
+            return;
+        }
+
+        // Confirmar sobrescritura
+        if (fichero.exists()) {
+            if (!LectorConsola.confirmar("El fichero ya existe. ¿Quieres sobrescribirlo?")) {
+                System.out.println("Guardado cancelado.");
+                return;
+            }
+        }
+
+        // Guardar la colección completa
+        // Try-With Ressources creando el objetctoutputstream
+        try (ObjectOutputStream salida = new ObjectOutputStream(new FileOutputStream(fichero))) {
+            salida.writeObject(new ArrayList<>(PRODUCTOS));
+
+            System.out.println();
+            System.out.println("INVENTARIO GUARDADO CORRECTAMENTE");
+            System.out.println("Ruta: " + fichero.getAbsolutePath());
+            System.out.println("Productos guardados: " + PRODUCTOS.size());
+
+        } catch (IOException e) {
+            System.out.println("[ERROR] No se pudo guardar el inventario.");
+        }
+    }
+
+    public void recuperarInventario() {
+        // Solicitar la ruta del fichero
+        String entrada = LectorConsola.leerTexto("Ruta del fichero: ");
+
+        if (entrada == null || entrada.isBlank()) {
+            System.out.println("[ERROR] Debes introducir una ruta.");
+            return;
+        }
+
+        File fichero = new File(entrada);
+
+        // Comprobar que el fichero existe
+        if (!fichero.exists() || !fichero.isFile()) {
+            System.out.println("[ERROR] El fichero no existe.");
+            return;
+        }
+
+        // Confirmar la sustitución del inventario actual
+        if (!PRODUCTOS.isEmpty()) {
+            if (!LectorConsola.confirmar("El inventario contiene productos. ¿Quieres sustituirlo?")) {
+                System.out.println("Recuperación cancelada.");
+                return;
+            }
+        }
+
+        try (ObjectInputStream entradaObjeto = new ObjectInputStream(new FileInputStream(fichero))) {
+
+            Object objeto = entradaObjeto.readObject();
+
+            // Comprobar que el objeto sea una lista
+            if (!(objeto instanceof ArrayList<?>)) {
+                System.out.println("[ERROR] El fichero no contiene una lista válida.");
+                return;
+            }
+
+            // Tiene ? porque lanza una advertencia de casting
+            ArrayList<?> listaLeida = (ArrayList<?>) objeto;
+            List<Producto> productosRecuperados = new ArrayList<>();
+            boolean valido = true;
+
+            // Comprobar los productos recuperados
+            for (int i = 0; i < listaLeida.size() && valido; i++) {
+                Object elemento = listaLeida.get(i);
+
+                // Si es un objeto Producto, es valido
+                if (!(elemento instanceof Producto)) {
+                    valido = false;
+
+                } else {
+                    Producto p = (Producto) elemento;
+                    // Comprobar que no haya ninguno duplicado y que respeten las reglas
+                    List<String> errores = validarProducto(p, productosRecuperados);
+
+                    // Valida que el producto este bien
+                    if (errores.isEmpty()) {
+                        productosRecuperados.add(p);
+
+                    } else {
+                        valido = false;
+                    }
+                }
+            }
+
+            // Sustituir el inventario solo si todo es correcto
+            if (valido) {
+                PRODUCTOS.clear();
+                PRODUCTOS.addAll(productosRecuperados);
+
+                System.out.println("Inventario recuperado correctamente.");
+                System.out.println("Productos recuperados: " + PRODUCTOS.size());
+
+            } else {
+                System.out.println("[ERROR] El fichero contiene productos inválidos.");
+            }
+
+        } catch (IOException e) {
+            System.out.println("[ERROR] No se pudo leer el fichero.");
+        } catch (ClassNotFoundException e) {
+            System.out.println("[ERROR] No se ha encontrado una clase necesaria.");
         }
     }
 }
