@@ -2,13 +2,16 @@ package es.iesisidra.datastock.servicio;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -16,6 +19,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -396,7 +400,8 @@ public class Inventario {
             }
 
             // Mostrar el resumen
-            System.out.println("\nIMPORTACIÓN DE PRODUCTOS");
+            System.out.println();
+            System.out.println("IMPORTACIÓN DE PRODUCTOS");
             System.out.println("--------------------------------------");
             System.out.println("Productos encontrados: " + encontrados);
             System.out.println("Productos importados: " + importados);
@@ -455,7 +460,8 @@ public class Inventario {
         }
 
         // Mostrar los productos ordenados
-        System.out.println("\nLISTADO DE PRODUCTOS");
+        System.out.println();
+        System.out.println("LISTADO DE PRODUCTOS");
         System.out.println("----------------------------------------");
 
         for (int i = 0; i < productosOrdenados.size(); i++) {
@@ -498,7 +504,8 @@ public class Inventario {
             // Asi evitamos que siga iterando y terminamos el bucle
             if (p.getCodigo() != null && p.getCodigo().trim().equalsIgnoreCase(codigoBuscado)) {
 
-                System.out.println("\nPRODUCTO ENCONTRADO");
+                System.out.println();
+                System.out.println("PRODUCTO ENCONTRADO");
                 System.out.println("------------------------------");
                 System.out.println("Código: " + p.getCodigo());
                 System.out.println("Nombre: " + p.getNombre());
@@ -542,7 +549,8 @@ public class Inventario {
             // ya que ambos contienen la palabra teclado.
             if (p.getNombre() != null && p.getNombre().toLowerCase().contains(nombreBuscado.toLowerCase())) {
 
-                System.out.println("\nPRODUCTO ENCONTRADO");
+                System.out.println();
+                System.out.println("PRODUCTO ENCONTRADO");
                 System.out.println("------------------------------");
                 System.out.println("Código: " + p.getCodigo());
                 System.out.println("Nombre: " + p.getNombre());
@@ -558,6 +566,188 @@ public class Inventario {
 
         if (!encontrado) {
             System.out.println("[ERROR] No se encontraron productos con ese nombre.");
+        }
+    }
+
+    public void exportarJson() {
+
+        // Comprobar si el inventario está vacío
+        if (PRODUCTOS.isEmpty()) {
+            System.out.println("[ERROR] El inventario está vacío.");
+            return;
+        }
+
+        // Solicitar la ruta del fichero
+        String entrada = LectorConsola.leerTexto("Ruta del fichero JSON: ");
+
+        if (entrada == null || entrada.isBlank()) {
+            System.out.println("[ERROR] Debes introducir una ruta.");
+            return;
+        }
+
+
+        File fichero = new File(entrada);
+        File directorio = fichero.getAbsoluteFile().getParentFile();
+
+        // Comprobar si existe el directorio
+        if (directorio == null || !directorio.exists() || !directorio.isDirectory()) {
+            System.out.println("[ERROR] El directorio de destino no existe.");
+            return;
+        }
+
+        // Comprobar si el valor de fichero es un directorio.
+        if (fichero.isDirectory()) {
+            System.out.println("[ERROR] La ruta indicada corresponde a un directorio, no a un archivo.");
+            return;
+        }
+
+        // Comprobar si el fichero ya existe
+        if (fichero.exists()) {
+
+            if (!LectorConsola.confirmar("El fichero ya existe. ¿Quieres sobrescribirlo?")) {
+                System.out.println("Exportación cancelada.");
+                return;
+            }
+        }
+
+        try {
+            // Crear el objeto raíz del JSON
+            JsonObject raiz = new JsonObject();
+            JsonArray productosJson = new JsonArray();
+
+            // Añadir los productos al array
+            for (int i = 0; i < PRODUCTOS.size(); i++) {
+
+                Producto p = PRODUCTOS.get(i);
+
+                JsonObject productoJson = new JsonObject();
+
+                productoJson.addProperty("codigo", p.getCodigo());
+                productoJson.addProperty("nombre", p.getNombre());
+                productoJson.addProperty("precio", p.getPrecio());
+                productoJson.addProperty("stock", p.getStock());
+                productoJson.addProperty("categoriaId", p.getCategoriaId());
+                productoJson.addProperty("proveedorId", p.getProveedorId());
+
+                productosJson.add(productoJson);
+            }
+
+            // Añadir el array al objeto raíz
+            raiz.add("productos", productosJson);
+
+            // Configurar Gson para que el JSON tenga indentación
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            // Escribir el JSON en el fichero
+            try (FileWriter escritor = new FileWriter(fichero)) {
+                gson.toJson(raiz, escritor);
+            }
+
+            System.out.println();
+            System.out.println("EXPORTACIÓN JSON FINALIZADA");
+            System.out.println("Ruta: " + fichero.getAbsolutePath());
+            System.out.println("Formato: JSON");
+            System.out.println("Productos exportados: " + PRODUCTOS.size());
+
+        } catch (IOException e) {
+            System.out.println("[ERROR] No se pudo escribir el fichero JSON.");
+        }
+    }
+
+    public void exportarXml() {
+        // Comprobar si el inventario está vacío
+        if (PRODUCTOS.isEmpty()) {
+            System.out.println("[ERROR] El inventario está vacío.");
+            return;
+        }
+
+        // Solicitar la ruta del fichero
+        String entrada = LectorConsola.leerTexto("Ruta del fichero XML: ");
+
+        if (entrada == null || entrada.isBlank()) {
+            System.out.println("[ERROR] Debes introducir una ruta.");
+            return;
+        }
+
+        File fichero = new File(entrada);
+        File directorio = fichero.getAbsoluteFile().getParentFile();
+
+        // Comprobar si existe el directorio
+        if (directorio == null || !directorio.exists() || !directorio.isDirectory()) {
+            System.out.println("[ERROR] El directorio de destino no existe.");
+            return;
+        }
+
+        // Comprobar si la ruta es un directorio
+        if (fichero.isDirectory()) {
+            System.out.println("[ERROR] La ruta indicada corresponde a un directorio, no a un archivo.");
+            return;
+        }
+
+        // Comprobar si el fichero ya existe
+        if (fichero.exists()) {
+            if (!LectorConsola.confirmar("El fichero ya existe. ¿Quieres sobrescribirlo?")) {
+                System.out.println("Exportación cancelada.");
+                return;
+            }
+        }
+
+        try {
+            // Crear el documento XML
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            Document documento = factory.newDocumentBuilder().newDocument();
+
+            // Crear el elemento raíz
+            Element raiz = documento.createElement("catalogo");
+            documento.appendChild(raiz);
+
+            // Crear y Añadir los productos al XML
+            for (int i = 0; i < PRODUCTOS.size(); i++) {
+                Producto p = PRODUCTOS.get(i);
+
+                Element productoXml = documento.createElement("producto");
+                raiz.appendChild(productoXml);
+
+                Element codigo = documento.createElement("codigo");
+                codigo.setTextContent(p.getCodigo());
+                productoXml.appendChild(codigo);
+
+                Element nombre = documento.createElement("nombre");
+                nombre.setTextContent(p.getNombre());
+                productoXml.appendChild(nombre);
+
+                Element precio = documento.createElement("precio");
+                precio.setTextContent(p.getPrecio().toString());
+                productoXml.appendChild(precio);
+
+                Element stock = documento.createElement("stock");
+                stock.setTextContent(String.valueOf(p.getStock()));
+                productoXml.appendChild(stock);
+
+                Element categoriaId = documento.createElement("categoriaId");
+                categoriaId.setTextContent(String.valueOf(p.getCategoriaId()));
+                productoXml.appendChild(categoriaId);
+
+                Element proveedorId = documento.createElement("proveedorId");
+                proveedorId.setTextContent(String.valueOf(p.getProveedorId()));
+                productoXml.appendChild(proveedorId);
+            }
+
+            // Guardar el documento XML
+            AlumnoXmlRepository repositorio = new AlumnoXmlRepository();
+            repositorio.guardar(documento, fichero.toPath());
+
+            System.out.println();
+            System.out.println("EXPORTACIÓN XML FINALIZADA");
+            System.out.println("Ruta: " + fichero.getAbsolutePath());
+            System.out.println("Formato: XML");
+            System.out.println("Productos exportados: " + PRODUCTOS.size());
+
+        // Manejo de excepciones
+        } catch (ParserConfigurationException e) {
+            System.out.println("[ERROR] No se pudo crear el documento XML.");
+        } catch (IOException | TransformerException e) {
+            System.out.println("[ERROR] No se pudo guardar el fichero XML.");
         }
     }
 }
