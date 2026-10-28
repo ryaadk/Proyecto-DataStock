@@ -54,6 +54,7 @@ public class MenuPrincipal {
 
     private void menuConsultas() {
         int opcion;
+
         do {
             System.out.println("\n---------- CONSULTA DE PRODUCTOS ----------");
             System.out.println("1. Listar todos los productos");
@@ -62,9 +63,9 @@ public class MenuPrincipal {
             System.out.println("0. Volver al menú principal");
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 3);
             switch (opcion) {
-                case 1 -> pendiente("RF-FIC-04 · Listar productos");
-                case 2 -> pendiente("RF-FIC-04 · Buscar por código");
-                case 3 -> pendiente("RF-FIC-04 · Buscar por nombre");
+                case 1 -> inventario.listarProductos();
+                case 2 -> inventario.buscarProductoPorCodigo();
+                case 3 -> inventario.buscarProductoPorNombre();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -73,6 +74,7 @@ public class MenuPrincipal {
 
     private void menuExportaciones() {
         int opcion;
+
         do {
             System.out.println("\n---------- EXPORTAR PRODUCTOS ----------");
             System.out.println("1. Exportar productos a JSON");
@@ -90,6 +92,7 @@ public class MenuPrincipal {
 
     private void menuSerializacion() {
         int opcion;
+
         do {
             System.out.println("\n---------- GUARDAR Y RECUPERAR INVENTARIO ----------");
             System.out.println("1. Guardar inventario en fichero .dat");

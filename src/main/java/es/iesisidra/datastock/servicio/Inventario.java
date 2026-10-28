@@ -107,7 +107,7 @@ public class Inventario {
         List<String> errores = new ArrayList<>();
 
         // Validar codigo
-        if (p.getCodigo() == null || p.getCodigo().trim().isEmpty()) {
+        if (p.getCodigo() == null || p.getCodigo().trim().isBlank()) {
             errores.add("El código no puede estar vacío");
 
         } else if (p.getCodigo().trim().length() > 12) {
@@ -130,7 +130,7 @@ public class Inventario {
         }
 
         // Validar nombre
-        if (p.getNombre() == null || p.getNombre().trim().isEmpty()) {
+        if (p.getNombre() == null || p.getNombre().trim().isBlank()) {
             errores.add("El nombre no puede estar vacío");
 
         } else if (p.getNombre().trim().length() < 3 || p.getNombre().trim().length() > 100) {
@@ -167,7 +167,7 @@ public class Inventario {
         String entrada = LectorConsola.leerTexto("Ruta: ");
         System.out.println();
 
-        if (entrada == null || entrada.isEmpty()) {
+        if (entrada == null || entrada.isBlank()) {
             System.out.println("[ERROR] Debes introducir una ruta.");
             return;
         }
@@ -277,7 +277,7 @@ public class Inventario {
         String entrada = LectorConsola.leerTexto("Ruta: ");
         System.out.println();
 
-        if (entrada == null || entrada.isEmpty()) {
+        if (entrada == null || entrada.isBlank()) {
             System.out.println("[ERROR] Debes introducir una ruta.");
             return;
         }
@@ -318,6 +318,7 @@ public class Inventario {
                 }
             }
 
+            // Contador que va aumentando cada vez que iteramos en un producto
             int numeroProducto = 0;
 
             // Si el no es un elemento, hace un continue para volver a iterar otra vez
@@ -329,6 +330,7 @@ public class Inventario {
 
                 Element elemento = (Element) productosXml.item(i);
 
+                // SI el tag no es producto pasa a la siguiente iteracion
                 if (!elemento.getTagName().equals("producto")) {
                     continue;
                 }
@@ -417,9 +419,145 @@ public class Inventario {
 
         } catch (SAXException e) {
             System.out.println("[ERROR] El XML está mal formado o contiene DTD no permitidas.");
-            
+
         } catch (IOException e) {
             System.out.println("[ERROR] No se pudo leer el fichero.");
+        }
+    }
+
+    public void listarProductos() {
+        if (PRODUCTOS.isEmpty()) {
+            System.out.println("No hay productos en el inventario.");
+            return;
+        }
+
+        // Crear una copia para no modificar la lista original
+        List<Producto> productosOrdenados = new ArrayList<>(PRODUCTOS);
+
+        // Ordenar por código usando el metodo de ordenacion por burbuja
+        // El primer bucle hace la pasada por productos 
+        // El segundo bucle comprueba los productos que estan al lado
+        for (int i = 0; i < productosOrdenados.size() - 1; i++) {
+            for (int j = 0; j < productosOrdenados.size() - 1 - i; j++) {
+
+                String codigo1 = productosOrdenados.get(j).getCodigo();
+                String codigo2 = productosOrdenados.get(j + 1).getCodigo();
+
+                // Comparar codigos, si es distinto de 0 el resultado, el codigo es mayor o menor.
+                // Si es positivo significa que el codigo 1 es mayor que el codigo 2
+                if (codigo1.compareToIgnoreCase(codigo2) > 0) {
+                    Producto auxiliar = productosOrdenados.get(j);
+
+                    productosOrdenados.set(j, productosOrdenados.get(j + 1));
+                    productosOrdenados.set(j + 1, auxiliar);
+                }
+            }
+        }
+
+        // Mostrar los productos ordenados
+        System.out.println("\nLISTADO DE PRODUCTOS");
+        System.out.println("----------------------------------------");
+
+        for (int i = 0; i < productosOrdenados.size(); i++) {
+            Producto p = productosOrdenados.get(i);
+
+            System.out.println("Código: " + p.getCodigo());
+            System.out.println("Nombre: " + p.getNombre());
+            System.out.println("Precio: " + p.getPrecio() + " €");
+            System.out.println("Stock: " + p.getStock());
+            System.out.println("Categoría: " + p.getCategoriaId());
+            System.out.println("Proveedor: " + p.getProveedorId());
+
+            System.out.println("----------------------------------------");
+        }
+    }
+
+    public void buscarProductoPorCodigo() {
+        if (PRODUCTOS.isEmpty()) {
+            System.out.println("No hay productos en el inventario.");
+            return;
+        }
+
+        String codigoBuscado = LectorConsola.leerTexto("Código: ");
+
+        if (codigoBuscado == null || codigoBuscado.isBlank()) {
+            System.out.println("[ERROR] Debes introducir un código.");
+            return;
+        }
+
+        // ELiminar espacios al principio y al final
+        codigoBuscado = codigoBuscado.trim();
+
+        boolean encontrado = false;
+
+        for (int i = 0; i < PRODUCTOS.size() && !encontrado; i++) {
+
+            Producto p = PRODUCTOS.get(i);
+
+            // SI lo encuentra, imprime por pantalla los datos del producto y cambia el valor de la bandera
+            // Asi evitamos que siga iterando y terminamos el bucle
+            if (p.getCodigo() != null && p.getCodigo().trim().equalsIgnoreCase(codigoBuscado)) {
+
+                System.out.println("\nPRODUCTO ENCONTRADO");
+                System.out.println("------------------------------");
+                System.out.println("Código: " + p.getCodigo());
+                System.out.println("Nombre: " + p.getNombre());
+                System.out.println("Precio: " + p.getPrecio() + " €");
+                System.out.println("Stock: " + p.getStock());
+                System.out.println("Categoría: " + p.getCategoriaId());
+                System.out.println("Proveedor: " + p.getProveedorId());
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("[ERROR] No existe ningún producto con ese código.");
+        }
+    }
+
+    public void buscarProductoPorNombre() {
+        if (PRODUCTOS.isEmpty()) {
+            System.out.println("No hay productos en el inventario.");
+            return;
+        }
+
+        String nombreBuscado = LectorConsola.leerTexto("Nombre: ");
+
+        if (nombreBuscado == null || nombreBuscado.isBlank()) {
+            System.out.println("[ERROR] Debes introducir un nombre.");
+            return;
+        }
+
+        // ELiminar espacios al principio y al final
+        nombreBuscado = nombreBuscado.trim();
+
+        boolean encontrado = false;
+
+        for (int i = 0; i < PRODUCTOS.size(); i++) {
+
+            Producto p = PRODUCTOS.get(i);
+
+            // Revisamos si el nombe del producto contiene por ejemplo Teclado.
+            // Si tenemos  Productos, por ejemplo Teclado Mecanico, Teclado de Membrana, Teclado, devolverá ambos
+            // ya que ambos contienen la palabra teclado.
+            if (p.getNombre() != null && p.getNombre().toLowerCase().contains(nombreBuscado.toLowerCase())) {
+
+                System.out.println("\nPRODUCTO ENCONTRADO");
+                System.out.println("------------------------------");
+                System.out.println("Código: " + p.getCodigo());
+                System.out.println("Nombre: " + p.getNombre());
+                System.out.println("Precio: " + p.getPrecio() + " €");
+                System.out.println("Stock: " + p.getStock());
+                System.out.println("Categoría: " + p.getCategoriaId());
+                System.out.println("Proveedor: " + p.getProveedorId());
+                System.out.println("------------------------------");
+
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("[ERROR] No se encontraron productos con ese nombre.");
         }
     }
 }
