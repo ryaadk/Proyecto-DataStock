@@ -24,7 +24,7 @@ import es.iesisidra.datastock.config.XmlConfig;
  * Encapsula la lectura y escritura de documentos XML con DOM.
  * Los recursos se cierran automáticamente con try-with-resources.
  */
-public class AlumnoXmlRepository {
+public class ProductoXmlRepository {
     public Document leer(Path ruta) throws IOException, SAXException, ParserConfigurationException {
         // El parser usa la configuración segura compartida para evitar XXE.
         try (InputStream entrada = Files.newInputStream(ruta)) {

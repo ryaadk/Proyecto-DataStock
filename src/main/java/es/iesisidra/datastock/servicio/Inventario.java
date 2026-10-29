@@ -30,7 +30,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import es.iesisidra.datastock.modelo.Producto;
-import es.iesisidra.datastock.repository.AlumnoXmlRepository;
+import es.iesisidra.datastock.repository.ProductoXmlRepository;
 import es.iesisidra.datastock.util.LectorConsola;
 
 /**
@@ -299,7 +299,7 @@ public class Inventario {
 
         try {
             // Leer el XML utilizando tu repositorio
-            AlumnoXmlRepository repositorio = new AlumnoXmlRepository();
+            ProductoXmlRepository repositorio = new ProductoXmlRepository();
             Document documento = repositorio.leer(Path.of(entrada));
 
             Element raiz = documento.getDocumentElement();
@@ -738,7 +738,7 @@ public class Inventario {
             }
 
             // Guardar el documento XML
-            AlumnoXmlRepository repositorio = new AlumnoXmlRepository();
+            ProductoXmlRepository repositorio = new ProductoXmlRepository();
             repositorio.guardar(documento, fichero.toPath());
 
             System.out.println();

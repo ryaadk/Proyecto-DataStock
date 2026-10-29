@@ -27,6 +27,7 @@ public class MenuPrincipal {
             System.out.println("4. Consultar productos");
             System.out.println("5. Exportar productos");
             System.out.println("6. Guardar y recuperar inventario");
+            System.out.println("7. Guardar y recuperar inventario");
             System.out.println("0. Salir");
 
             opcion = LectorConsola.leerOpcion("Selecciona una opción: ", 0, 6);

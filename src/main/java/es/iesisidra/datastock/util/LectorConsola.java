@@ -34,6 +34,17 @@ public final class LectorConsola {
         }
     }
 
+    /** Lee un double; repite la pregunta ante una entrada no válida. */
+    public static double leerDouble(String mensaje) {
+        while (true) {
+            String texto = leerTexto(mensaje).trim();
+            try { return Double.parseDouble(texto); }
+            catch (NumberFormatException ex) {
+                System.out.println(ColoresConsola.pintar("Introduce un número entero válido.", ColoresConsola.AMARILLO));
+            }
+        }
+    }
+
     /** Lee una opción comprendida entre los límites indicados. */
     public static int leerOpcion(String mensaje, int minimo, int maximo) {
         while (true) {
