@@ -28,6 +28,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.repository.ProductoXmlRepository;
@@ -237,7 +238,7 @@ public class Inventario {
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println("[Error] Error al parsear los productos.");
                 }   
             }
 
@@ -265,8 +266,8 @@ public class Inventario {
 
             System.out.println("Importación finalizada.");
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (JsonSyntaxException e) {
+            System.out.println("[ERROR] Error a la hora de leer el archivo.");
         }
     }
 
