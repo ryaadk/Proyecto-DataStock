@@ -267,7 +267,9 @@ public class Inventario {
             System.out.println("Importación finalizada.");
 
         } catch (JsonSyntaxException e) {
-            System.out.println("[ERROR] Error a la hora de leer el archivo.");
+            System.out.println("[ERROR] Error a la hora de leer el archivo, JSON mal formado");
+        } catch (IOException e) {
+            System.out.println("[ERROR] Error a la hora de leer el archivo con el reader.");
         }
     }
 
