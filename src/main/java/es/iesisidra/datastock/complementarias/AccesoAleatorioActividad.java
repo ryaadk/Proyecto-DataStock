@@ -20,11 +20,27 @@ public final class AccesoAleatorioActividad {
     private AccesoAleatorioActividad() {
     }
 
+    public static void main(String[] args) {
+        Inventario inventario = new Inventario();
+
+        System.out.println("===== ACCESO ALEATORIO =====");
+        System.out.println("Antes de empezar hay que importar los productos.");
+        System.out.println("Importalos usando el catalogo_valido.json");
+
+        // Importar el catálogo JSON indicando la ruta por consola
+        inventario.importarJson();
+        System.out.println();
+
+        // Generar el fichero binario y trabajar con él
+        ejecutar(inventario);
+    }
+
     public static void ejecutar(Inventario inventario) {
 
         // Generar el fichero con los productos cargados en memoria
         if (generarStockBinario(inventario.getProductos())) {
             mostrarProductos();
+            System.out.println();
             gestionarAccesoAleatorioStock();
         }
     }
@@ -32,7 +48,7 @@ public final class AccesoAleatorioActividad {
     private static boolean generarStockBinario(List<Producto> productos) {
 
         if (productos.isEmpty()) {
-            System.out.println("El inventario está vacío.");
+            System.out.println("[ERROR] El inventario está vacío.");
             return false;
         }
 
