@@ -245,19 +245,14 @@ public class Inventario {
             System.out.println();
             System.out.println("IMPORTACIÓN DE PRODUCTOS");
             System.out.println("--------------------------------------");
-            System.out.println("Productos encontrados:");
-            System.out.println(encontrados);
-
-            System.out.println("Productos importados:");
-            System.out.println(importados);
-
-            System.out.println("Productos rechazados:");
-            System.out.println(rechazados);
-
+            System.out.println("Productos encontrados: " +  encontrados);
+            System.out.println("Productos importados: " + importados);
+            System.out.println("Productos rechazados:" +  rechazados);
             System.out.println("Incidencias:");
 
             if (incidencias.isEmpty()) {
                 System.out.println("No hay incidencias.");
+                
             } else {
                 for (int i = 0; i < incidencias.size(); i++) {
                     System.out.println("- " + incidencias.get(i));

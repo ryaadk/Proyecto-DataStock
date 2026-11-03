@@ -40,7 +40,7 @@ public final class LectorConsola {
             String texto = leerTexto(mensaje).trim();
             try { return Double.parseDouble(texto); }
             catch (NumberFormatException ex) {
-                System.out.println(ColoresConsola.pintar("Introduce un número entero válido.", ColoresConsola.AMARILLO));
+                System.out.println(ColoresConsola.pintar("Introduce un número decimal válido.", ColoresConsola.AMARILLO));
             }
         }
     }
