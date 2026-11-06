@@ -17,7 +17,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.iesisidra.datastock.repository.ProductoXmlRepository;
-import es.iesisidra.datastock.util.LectorConsola;
+import es.iesisidra.datastock.util.Util;
 
 public final class XPathActividad {
 
@@ -30,7 +30,7 @@ public final class XPathActividad {
     public static void main(String[] args) {
 
         // Valido si la ruta recibida es nula o está vacía.
-        String ruta = LectorConsola.leerTexto("Ruta del fichero XML: ");
+        String ruta = Util.leerTexto("Ruta del fichero XML: ");
 
         if (ruta == null || ruta.trim().isEmpty()) {
             System.out.println("ERROR: La ruta está vacía.");
@@ -67,12 +67,12 @@ public final class XPathActividad {
                 System.out.println("Fichero: " + ruta.trim());
                 System.out.println("1. Por código | 2. Por categoría | 3. Precio superior | 4. Contar | 0. Volver");
 
-                opcion = LectorConsola.leerOpcion("Opción: ", 0, 4);
+                opcion = Util.leerOpcion("Opción: ", 0, 4);
 
                 switch (opcion) {
                     case 1 -> {
                         // Busco por código seleccionando nodos para evitar inyección XPath.
-                        String codBuscado = LectorConsola.leerTexto("Introduce el código: ");
+                        String codBuscado = Util.leerTexto("Introduce el código: ");
 
                         if (codBuscado == null || codBuscado.trim().isEmpty()) {
                             System.out.println("ERROR: El código está vacío.");
@@ -98,7 +98,7 @@ public final class XPathActividad {
                     }
                     case 2 -> {
                         // Filtro por categoría mediante un predicado XPath.
-                        int catId = LectorConsola.leerEntero("ID Categoría: ");
+                        int catId = Util.leerEntero("ID Categoría: ");
 
                         if (catId <= 0) {
                             System.out.println("ERROR: La categoría debe ser positiva.");
@@ -116,7 +116,7 @@ public final class XPathActividad {
                     }
                     case 3 -> {
                         // Filtro por precio superior a un valor numérico.
-                        double precioMin = LectorConsola.leerDouble("Precio mínimo: ");
+                        double precioMin = Util.leerDouble("Precio mínimo: ");
 
                         if (!Double.isFinite(precioMin) || precioMin < 0) {
                             System.out.println("ERROR: Introduce un precio válido.");

@@ -10,7 +10,7 @@ import java.util.List;
 
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.servicio.Inventario;
-import es.iesisidra.datastock.util.LectorConsola;
+import es.iesisidra.datastock.util.Util;
 
 public final class AccesoAleatorioActividad {
 
@@ -62,7 +62,7 @@ public final class AccesoAleatorioActividad {
         File fichero = new File(RUTA);
 
         // Preguntar antes de sobrescribir el fichero existente
-        if (fichero.exists() && !LectorConsola.confirmar("El fichero ya existe. ¿Sobrescribirlo?")) {
+        if (fichero.exists() && !Util.confirmar("El fichero ya existe. ¿Sobrescribirlo?")) {
             System.out.println("Operación cancelada.");
             return false;
         }
@@ -174,7 +174,7 @@ public final class AccesoAleatorioActividad {
             System.out.println("Registros: " + cantidad + " | Tamaño: " + tamano + " bytes");
 
             // Pedir la posición del producto que se quiere consultar
-            int posicion = LectorConsola.leerOpcion("Consultar posición (0-" + (cantidad - 1) + "): ", 0, cantidad - 1);
+            int posicion = Util.leerOpcion("Consultar posición (0-" + (cantidad - 1) + "): ", 0, cantidad - 1);
 
             // Ir al inicio del registro seleccionado
             archivo.seek((long) posicion * TAMANO_REGISTRO);
@@ -193,7 +193,7 @@ public final class AccesoAleatorioActividad {
             System.out.println(codigo.toString().trim() + " | " + precio + " € | stock " + stockAnterior);
 
             // Pedir el nuevo stock
-            int nuevoStock = LectorConsola.leerEntero("Nuevo stock: ");
+            int nuevoStock = Util.leerEntero("Nuevo stock: ");
 
             if (nuevoStock < 0) {
                 System.out.println("[ERROR] El stock no puede ser negativo.");

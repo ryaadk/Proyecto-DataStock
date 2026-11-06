@@ -1,5 +1,6 @@
 package es.iesisidra.datastock.util;
 
+import java.io.File;
 import java.util.Scanner;
 
 /**
@@ -8,9 +9,11 @@ import java.util.Scanner;
  * completas y se convierten cuando procede, evitando conflictos entre
  * {@code nextInt()} y {@code nextLine()}.</p>
  */
-public final class LectorConsola {
+public final class Util {
     private static final Scanner TECLADO = new Scanner(System.in);
-    private LectorConsola() { }
+
+    private Util() {
+    }
 
     /** Lee una línea; permite una cadena vacía. */
     public static String leerTexto(String mensaje) {
@@ -21,6 +24,25 @@ public final class LectorConsola {
             System.exit(0);
         }
         return TECLADO.nextLine();
+    }
+
+    public static String leerTextoNoVacio(String mensaje) {
+        boolean esValido = false;
+        String cadena;
+
+        do {
+            cadena = leerTexto(mensaje);
+
+            if (cadena == null || cadena.isEmpty()) {
+                System.out.println("Debes introducir un valor.");
+            } else {
+
+                esValido = true;
+            }
+
+        } while (!esValido);
+
+        return cadena;
     }
 
     /** Lee un entero; repite la pregunta ante una entrada no válida. */
@@ -62,6 +84,20 @@ public final class LectorConsola {
             if (respuesta.equalsIgnoreCase("N")) return false;
             System.out.println("Responde S o N.");
         }
+    }
+
+    public static File pedirArchivo() {
+        String entrada = Util.leerTextoNoVacio("Ruta: ");
+        System.out.println();
+
+        File fichero = new File(entrada);
+
+        if (!fichero.exists() || !fichero.isFile()) {
+            System.out.println("[ERROR] El fichero no existe/no es un fichero.");
+            return null;
+        }
+
+        return fichero;
     }
 
     /** Detiene el menú hasta que el usuario pulse Intro. */
