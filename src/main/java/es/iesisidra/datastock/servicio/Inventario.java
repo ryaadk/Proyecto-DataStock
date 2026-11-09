@@ -52,4 +52,40 @@ public class Inventario {
     public void recuperarInventario() {
         InventarioDAT.recuperarInventario(PRODUCTOS);
     }
+
+    public void comprobarConexion() {
+        GestorBD.comprobarConexion();
+    }
+
+    public void altaCategoria() {
+        GestorCategorias.altaCategoria();
+    }
+
+    public void listarCategorias() {
+        GestorCategorias.listarCategorias();
+    }
+
+    public void modificarCategoria() {
+        GestorCategorias.modificarCategoria();
+    }
+
+    public void eliminarCategoria() {
+        GestorCategorias.eliminarCategoria();
+    }
+
+    public void altaProveedor() {
+        GestorProveedores.altaProveedor();
+    }
+
+    public void listarProveedores() {
+        GestorProveedores.listarProveedores();
+    }
+
+    public void modificarProveedor() {
+        GestorProveedores.modificarProveedor();
+    }
+
+    public void eliminarProveedor() {
+        GestorProveedores.eliminarProveedor();
+    }
 }

@@ -52,6 +52,7 @@ Desktop.ini
 .env
 .env.*
 !.env.example
+*.properties
 
 # Archivos de respaldo
 *~

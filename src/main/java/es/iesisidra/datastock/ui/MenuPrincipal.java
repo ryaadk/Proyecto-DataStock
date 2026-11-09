@@ -39,6 +39,7 @@ public class MenuPrincipal {
                 case 4 -> menuConsultas();
                 case 5 -> menuExportaciones();
                 case 6 -> menuSerializacion();
+                case 7 -> menuMysql();
                 case 0 -> System.out.println(ColoresConsola.pintar("Hasta pronto.", ColoresConsola.VERDE));
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -61,8 +62,9 @@ public class MenuPrincipal {
             System.out.println("1. Listar todos los productos");
             System.out.println("2. Buscar producto por código");
             System.out.println("3. Buscar productos por nombre");
+            System.out.println("4. Consultar productos con stock inferior a un umbral");
             System.out.println("0. Volver al menú principal");
-            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 3);
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 4);
             switch (opcion) {
                 case 1 -> inventario.listarProductos();
                 case 2 -> inventario.buscarProductoPorCodigo();
@@ -118,12 +120,95 @@ public class MenuPrincipal {
             System.out.println("2. Gestionar categorías");
             System.out.println("3. Gestionar proveedores");
             System.out.println("4. Gestionar productos (CRUD)");
-            System.out.println("5. Consultar y buscar productos");
-            System.out.println("6. Registrar entrada o salida de stock");
-            System.out.println("7. Consultar historial de movimientos");
-            System.out.println("8. Importar productos de memoria a MySQL");
-            System.out.println("9. Demostración de transacción con commit/rollback");
+            System.out.println("5. Registrar entrada o salida de stock");
+            System.out.println("6. Consultar historial de movimientos");
+            System.out.println("7. Importar productos de memoria a MySQL");
+            System.out.println("8. Demostración de transacción con commit/rollback");
             System.out.println("0. Volver al menú principal");
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 8);
+            switch (opcion) {
+                case 1 -> inventario.comprobarConexion();
+                case 2 -> menuCategorias();
+                case 3 -> menuProveedores();
+                case 4 -> menuProductos();
+                case 5 -> menuMovimientos();
+                case 6 -> menuHisorial();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        } while (opcion != 0);
+    }
+
+    private void menuCategorias() {
+        int opcion;
+
+        do {
+            System.out.println("\n---------- GESTION CATEGORÍAS ----------");
+            System.out.println("1. Dar de alta una categoría");
+            System.out.println("2. Listar categorías");
+            System.out.println("3. Modificar el nombre de una categoría");
+            System.out.println("4. Eliminar una categoría");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 4);
+            switch (opcion) {
+                case 1 -> inventario.altaCategoria();
+                case 2 -> inventario.listarCategorias();
+                case 3 -> inventario.modificarCategoria();
+                case 4 -> inventario.eliminarCategoria();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        } while (opcion != 0);
+    }
+
+    private void menuProveedores() {
+        int opcion;
+
+        do {
+            System.out.println("\n---------- GESTIÓN PROVEEDORES ----------");
+            System.out.println("1. Dar de alta un proveedor");
+            System.out.println("2. Listar proveedores");
+            System.out.println("3. Modificar un proveedor");
+            System.out.println("4. Eliminar un proveedor");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 4);
+            switch (opcion) {
+                case 1 -> inventario.guardarInventario();
+                case 2 -> inventario.recuperarInventario();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        } while (opcion != 0);
+    }
+
+    private void menuProductos() {
+        int opcion;
+
+        do {
+            System.out.println("\n---------- GESTIÓN PRODUCTOS ----------");
+            System.out.println("1. Dar de alta un producto");
+            System.out.println("2. Consultar producto por código");
+            System.out.println("3. Modificar un producto");
+            System.out.println("4. Eliminar un producto");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 4);
+            switch (opcion) {
+                case 1 -> inventario.guardarInventario();
+                case 2 -> inventario.recuperarInventario();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        } while (opcion != 0);
+    }
+
+    private void menuMovimientos() {
+        int opcion;
+
+        do {
+            System.out.println("\n---------- GESTIÓN MOVIMIENTOS ----------");
+            System.out.println("1. Registrar una ENTRADA de stock");
+            System.out.println("2. Registrar una SALIDA de stock");
+            System.out.println("0. Volver al menú MySQL");
             opcion = Util.leerOpcion("Selecciona una opción: ", 0, 2);
             switch (opcion) {
                 case 1 -> inventario.guardarInventario();
@@ -134,10 +219,21 @@ public class MenuPrincipal {
         } while (opcion != 0);
     }
 
-    /** Sustituir las llamadas por servicios propios a medida que se implementen los RF. */
-    private void pendiente(String requisito) {
-        System.out.println(ColoresConsola.pintar("[PENDIENTE] " + requisito, ColoresConsola.AMARILLO));
-        System.out.println("Esta funcionalidad debe desarrollarla el alumnado.");
-        Util.pausar();
+    private void menuHisorial() {
+        int opcion;
+
+        do {
+            System.out.println("\n---------- GESTIÓN HISTORIAL ----------");
+            System.out.println("1. Consultar todos los movimientos");
+            System.out.println("2. Consultar movimientos de un producto");
+            System.out.println("0. Volver al menú MySQL");
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 2);
+            switch (opcion) {
+                case 1 -> inventario.guardarInventario();
+                case 2 -> inventario.recuperarInventario();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        } while (opcion != 0);
     }
 }
