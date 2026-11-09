@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.iesisidra.datastock.modelo.Producto;
+import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.Util;
 
 public class InventarioDAT {
@@ -18,7 +19,7 @@ public class InventarioDAT {
 
     public static void guardarInventario(List<Producto> productos) {
         if (productos.isEmpty()) {
-            System.out.println("[ERROR] El inventario está vacío.");
+            System.out.println(ColoresConsola.pintar("No hay productos en el inventario.", ColoresConsola.ROJO));
             return;
         }
 
@@ -41,12 +42,12 @@ public class InventarioDAT {
             salida.writeObject(new ArrayList<>(productos));
 
             System.out.println();
-            System.out.println("INVENTARIO GUARDADO CORRECTAMENTE");
-            System.out.println("Ruta: " + fichero.getAbsolutePath());
-            System.out.println("Productos guardados: " + productos.size());
+            System.out.println(ColoresConsola.pintar("Inventario guardado correctamente", ColoresConsola.VERDE));
+            System.out.println(ColoresConsola.pintar("Ruta: " + fichero.getAbsolutePath(), ColoresConsola.VERDE));
+            System.out.println(ColoresConsola.pintar("Productos guardados: " + productos.size(), ColoresConsola.VERDE));
 
         } catch (IOException e) {
-            System.out.println("[ERROR] No se pudo guardar el inventario.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se pudo guardar el inventario.", ColoresConsola.ROJO));
         }
     }
 
@@ -66,12 +67,11 @@ public class InventarioDAT {
         }
 
         try (ObjectInputStream entradaObjeto = new ObjectInputStream(new FileInputStream(fichero))) {
-
             Object objeto = entradaObjeto.readObject();
 
             // Comprobar que el objeto sea una lista
             if (!(objeto instanceof ArrayList<?>)) {
-                System.out.println("[ERROR] El fichero no contiene una lista válida.");
+                System.out.println(ColoresConsola.pintar("[ERROR] El fichero no contiene una lista válida.", ColoresConsola.ROJO));
                 return;
             }
 
@@ -108,17 +108,17 @@ public class InventarioDAT {
                 productos.clear();
                 productos.addAll(productosRecuperados);
 
-                System.out.println("Inventario recuperado correctamente.");
-                System.out.println("Productos recuperados: " + productos.size());
+                System.out.println(ColoresConsola.pintar("Inventario recuperado correctamente.", ColoresConsola.VERDE));
+                System.out.println(ColoresConsola.pintar("Productos recuperados: " + productos.size(), ColoresConsola.VERDE));
 
             } else {
-                System.out.println("[ERROR] El fichero contiene productos inválidos.");
+                System.out.println(ColoresConsola.pintar("[ERROR] El fichero contiene productos inválidos.", ColoresConsola.ROJO));
             }
 
         } catch (IOException e) {
-            System.out.println("[ERROR] No se pudo leer el fichero.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se pudo leer el fichero.", ColoresConsola.ROJO));
         } catch (ClassNotFoundException e) {
-            System.out.println("[ERROR] No se ha encontrado una clase necesaria.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se ha encontrado una clase necesaria.", ColoresConsola.ROJO));
         }
     }
 }

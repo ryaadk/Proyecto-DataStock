@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.repository.ProductoXmlRepository;
+import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.Util;
 
 public class InventarioXML {
@@ -38,7 +39,7 @@ public class InventarioXML {
         Element raiz = documento.getDocumentElement();
 
         if (!raiz.getTagName().equals("catalogo")) {
-            System.out.println("[ERROR] La raíz debe ser <catalogo>.");
+            System.out.println(ColoresConsola.pintar("[ERROR] La raíz debe ser <catalogo>.", ColoresConsola.ROJO));
             return false;
         }
 
@@ -84,8 +85,7 @@ public class InventarioXML {
     private static void addIncidencias(List<String> incidencias, List<String> errores, int numeroProducto) {
 
         for (int i = 0; i < errores.size(); i++) {
-            incidencias.add("Producto " + numeroProducto + ": "
-                    + errores.get(i) + ".");
+            incidencias.add("Producto " + numeroProducto + ": " + errores.get(i) + ".");
         }
     }
 
@@ -131,7 +131,7 @@ public class InventarioXML {
             }
         }
 
-        System.out.println("Importación finalizada.");
+        System.out.println(ColoresConsola.pintar("Importación finalizada.", ColoresConsola.VERDE));
     }
 
     public static void importarXml(List<Producto> productos) {
@@ -167,6 +167,11 @@ public class InventarioXML {
                 }
             }
 
+            if (encontrados <= 0) {
+                System.out.println(ColoresConsola.pintar("[ERROR] No se han encontrado productos en el fichero.xml.", ColoresConsola.ROJO));
+                return;
+            }
+
             List<String> incidencias = new ArrayList<>();
 
             for (int i = 0; i < productosXml.getLength(); i++) {
@@ -195,13 +200,13 @@ public class InventarioXML {
             mostrarResumenImportacion(encontrados, importados, rechazados, incidencias);
 
         } catch (ParserConfigurationException e) {
-            System.out.println("[ERROR] No se pudo configurar el analizador XML.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se pudo configurar el analizador XML.", ColoresConsola.ROJO));
 
         } catch (SAXException e) {
-            System.out.println("[ERROR] El XML está mal formado o contiene DTD no permitidas.");
+            System.out.println(ColoresConsola.pintar("[ERROR] El XML está mal formado o contiene DTD no permitidas.", ColoresConsola.ROJO));
 
         } catch (IOException e) {
-            System.out.println("[ERROR] No se pudo leer el fichero.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se pudo leer el fichero.", ColoresConsola.ROJO));
         }
     }
 
@@ -256,7 +261,7 @@ public class InventarioXML {
 
     public static void exportarXml(List<Producto> productos) {
         if (productos.isEmpty()) {
-            System.out.println("[ERROR] No hay productos para exportar.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No hay productos para exportar.", ColoresConsola.ROJO));
             return;
         }
 
@@ -282,16 +287,16 @@ public class InventarioXML {
             repositorio.guardar(documento, fichero.toPath());
 
             System.out.println();
-            System.out.println("EXPORTACIÓN XML FINALIZADA");
+            System.out.println("Exportacion XML finalizada.");
             System.out.println("Ruta: " + fichero.getAbsolutePath());
             System.out.println("Formato: XML");
             System.out.println("Productos exportados: " + productos.size());
 
         } catch (ParserConfigurationException e) {
-            System.out.println("[ERROR] No se pudo crear el documento XML.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se pudo crear el documento XML.", ColoresConsola.ROJO));
 
         } catch (IOException | TransformerException e) {
-            System.out.println("[ERROR] No se pudo guardar el fichero XML.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se pudo guardar el fichero XML.", ColoresConsola.ROJO));
         }
     }
 }

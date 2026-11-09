@@ -3,6 +3,7 @@ package es.iesisidra.datastock.servicio;
 import java.util.List;
 
 import es.iesisidra.datastock.modelo.Producto;
+import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.Util;
 
 public class Consultas {
@@ -51,7 +52,7 @@ public class Consultas {
 
     public static void buscarProductoPorCodigo(List<Producto> productos) {
         if (productos.isEmpty()) {
-            System.out.println("No hay productos en el inventario.");
+            System.out.println(ColoresConsola.pintar("No hay productos en el inventario.", ColoresConsola.ROJO));
             return;
         }
 
@@ -68,13 +69,13 @@ public class Consultas {
         }
 
         if (!encontrado) {
-            System.out.println("[ERROR] No existe ningún producto con ese código.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No existe ningún producto con ese código.", ColoresConsola.ROJO));
         }
     }
 
     public static void buscarProductoPorNombre(List<Producto> productos) {
         if (productos.isEmpty()) {
-            System.out.println("No hay productos en el inventario.");
+            System.out.println(ColoresConsola.pintar("No hay productos en el inventario.", ColoresConsola.ROJO));
             return;
         }
 
@@ -92,7 +93,7 @@ public class Consultas {
         }
 
         if (!encontrado) {
-            System.out.println("[ERROR] No se encontraron productos con ese nombre.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se encontraron productos con ese nombre.", ColoresConsola.ROJO));
         }
     }
 }

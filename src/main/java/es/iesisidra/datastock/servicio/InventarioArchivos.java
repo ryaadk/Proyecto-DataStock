@@ -2,6 +2,7 @@ package es.iesisidra.datastock.servicio;
 
 import java.io.File;
 
+import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.Util;
 
 public class InventarioArchivos {
@@ -16,12 +17,12 @@ public class InventarioArchivos {
         File ruta = new File(entrada);
 
         if (!ruta.exists()) {
-            System.out.println("[ERROR] La ruta introducida no existe.");
+            System.out.println(ColoresConsola.pintar("[ERROR] La ruta introducida no existe.", ColoresConsola.ROJO));
             return;
         }
 
         if (!ruta.isDirectory()) {
-            System.out.println("[ERROR] La ruta no es un directorio.");
+            System.out.println(ColoresConsola.pintar("[ERROR] La ruta no es un directorio.", ColoresConsola.ROJO));
             return;
         }
 
@@ -30,7 +31,7 @@ public class InventarioArchivos {
 
         // Una vez termina la función imprimo por pantalla el total
         System.out.println();
-        System.out.println("Total ficheros: " + contadores[0] + " | Total directorios: " + contadores[1]);
+        System.out.println(ColoresConsola.pintar("Total ficheros: " + contadores[0] + " | Total directorios: " + contadores[1], ColoresConsola.VERDE));
     }
 
     private static void explorarDirectorio(File ruta, int[] contadores) {
@@ -38,7 +39,7 @@ public class InventarioArchivos {
         File[] elementos = ruta.listFiles();
 
         if (elementos == null) {
-            System.out.println("[ERROR] No se puede acceder a: " + ruta.getAbsolutePath());
+            System.out.println(ColoresConsola.pintar("[ERROR] No se puede acceder a: " + ruta.getAbsolutePath(), ColoresConsola.ROJO));
             return;
         }
 
@@ -53,9 +54,7 @@ public class InventarioArchivos {
 
             } else if (elemento.isDirectory()) {
                 System.out.println("[DIRECTORIO] " + elemento.getName());
-
                 contadores[1]++;
-                // Vuelve a ejecutar esta función para hacer otra vez el bucle y revisar el contenido de este directorio.
                 explorarDirectorio(elemento, contadores);
             }
         }

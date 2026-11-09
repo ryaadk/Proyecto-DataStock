@@ -16,6 +16,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import es.iesisidra.datastock.modelo.Producto;
+import es.iesisidra.datastock.util.ColoresConsola;
 import es.iesisidra.datastock.util.Util;
 
 public class InventarioJSON {
@@ -36,6 +37,11 @@ public class InventarioJSON {
         int rechazados = 0;
 
         List<String> incidencias = new ArrayList<>();
+
+        if (encontrados <= 0) {
+            System.out.println(ColoresConsola.pintar("[ERROR] No se han encontrado productos en el fichero.json.", ColoresConsola.ROJO));
+            return;
+        }
 
         System.out.println("===== IMPORTAR JSON =====");
         System.out.println("Productos encontrados: " + encontrados);
@@ -69,7 +75,7 @@ public class InventarioJSON {
             }
         }
 
-        System.out.println("Importación finalizada.");
+        System.out.println(ColoresConsola.pintar("Importación finalizada.", ColoresConsola.VERDE));
     }
 
     private static JsonArray obtenerRaizJson(File fichero) {
@@ -80,7 +86,7 @@ public class InventarioJSON {
 
             // Comprobar si la raiz es un objeto json
             if (!raiz.isJsonObject()) {
-                System.out.println("[ERROR] La raíz del JSON debe ser un objeto.");
+                System.out.println(ColoresConsola.pintar("[ERROR] La raíz del JSON debe ser un objeto.", ColoresConsola.ROJO));
                 return productos;
             }
 
@@ -88,7 +94,7 @@ public class InventarioJSON {
             JsonObject objetoRaiz = raiz.getAsJsonObject();
 
             if (!objetoRaiz.has("productos") || !objetoRaiz.get("productos").isJsonArray()) {
-                System.out.println("[ERROR] No existe un array válido llamado productos.");
+                System.out.println(ColoresConsola.pintar("[ERROR] No existe un array válido llamado productos.", ColoresConsola.ROJO));
                 return productos;
             }
 
@@ -97,9 +103,9 @@ public class InventarioJSON {
             
 
         } catch (IOException e) {
-            System.out.println("[ERROR] Error con reader: " + e.getMessage());
+            System.out.println(ColoresConsola.pintar("[ERROR] Error con reader: " + e.getMessage(), ColoresConsola.ROJO));
         } catch (JsonSyntaxException e) {
-            System.out.println("[ERROR] Error JSON mal formado");
+            System.out.println(ColoresConsola.pintar("[ERROR] Error JSON mal formado", ColoresConsola.ROJO));
         }
 
         return productos;
@@ -191,13 +197,13 @@ public class InventarioJSON {
             gson.toJson(raiz, escritor);
 
             System.out.println();
-            System.out.println("EXPORTACIÓN JSON FINALIZADA");
-            System.out.println("Ruta: " + fichero.getAbsolutePath());
-            System.out.println("Formato: JSON");
-            System.out.println("Productos exportados: " + productos.size());
+            System.out.println(ColoresConsola.pintar("Exportación JSON finalizada", ColoresConsola.VERDE));
+            System.out.println(ColoresConsola.pintar("Ruta: " + fichero.getAbsolutePath(), ColoresConsola.VERDE));
+            System.out.println(ColoresConsola.pintar("Formato: JSON", ColoresConsola.VERDE));
+            System.out.println(ColoresConsola.pintar("Productos exportados: " + productos.size(), ColoresConsola.VERDE));
             
         } catch (IOException e) {
-            System.out.println("[ERROR] No se pudo escribir el fichero JSON.");
+            System.out.println(ColoresConsola.pintar("[ERROR] No se pudo escribir el fichero JSON.", ColoresConsola.ROJO));
         }
     }
 }

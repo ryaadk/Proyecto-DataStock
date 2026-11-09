@@ -27,6 +27,7 @@ public class MenuPrincipal {
             System.out.println("4. Consultar productos");
             System.out.println("5. Exportar productos");
             System.out.println("6. Guardar y recuperar inventario");
+            System.out.println("7. Gestionar base de datos MySQL");
             System.out.println("0. Salir");
 
             opcion = Util.leerOpcion("Selecciona una opción: ", 0, 7);
@@ -97,6 +98,31 @@ public class MenuPrincipal {
             System.out.println("\n---------- GUARDAR Y RECUPERAR INVENTARIO ----------");
             System.out.println("1. Guardar inventario en fichero .dat");
             System.out.println("2. Recuperar inventario desde fichero .dat");
+            System.out.println("0. Volver al menú principal");
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 2);
+            switch (opcion) {
+                case 1 -> inventario.guardarInventario();
+                case 2 -> inventario.recuperarInventario();
+                case 0 -> { }
+                default -> throw new IllegalStateException("Opción inesperada");
+            }
+        } while (opcion != 0);
+    }
+
+    private void menuMysql() {
+        int opcion;
+
+        do {
+            System.out.println("\n---------- GESTIÓN MYSQL ----------");
+            System.out.println("1. Comprobar conexión y mostrar información de la BD");
+            System.out.println("2. Gestionar categorías");
+            System.out.println("3. Gestionar proveedores");
+            System.out.println("4. Gestionar productos (CRUD)");
+            System.out.println("5. Consultar y buscar productos");
+            System.out.println("6. Registrar entrada o salida de stock");
+            System.out.println("7. Consultar historial de movimientos");
+            System.out.println("8. Importar productos de memoria a MySQL");
+            System.out.println("9. Demostración de transacción con commit/rollback");
             System.out.println("0. Volver al menú principal");
             opcion = Util.leerOpcion("Selecciona una opción: ", 0, 2);
             switch (opcion) {

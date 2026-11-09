@@ -19,8 +19,7 @@ public final class ColoresConsola {
 
     /** @return true si está habilitado el coloreado ANSI. */
     public static boolean habilitados() {
-        return System.getenv("NO_COLOR") == null
-            && !"false".equalsIgnoreCase(System.getProperty("datastock.color", "true"));
+        return System.getenv("NO_COLOR") == null && !"false".equalsIgnoreCase(System.getProperty("datastock.color", "true"));
     }
     /** Devuelve texto coloreado, o texto plano si se desactiva ANSI. */
     public static String pintar(String texto, String color) {
