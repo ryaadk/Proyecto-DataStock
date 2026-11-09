@@ -11,12 +11,7 @@ public class InventarioArchivos {
 
     public static void explorar() {
         // Pido ruta y hago validaciones (Si existe, si esta vacía y si es un directorio)
-        String entrada = Util.leerTexto("Ruta: ");
-
-        if (entrada == null || entrada.isBlank()) {
-            System.out.println("[ERROR] Debes introducir una ruta.");
-            return;
-        }
+        String entrada = Util.leerTextoNoVacio("Ruta: ");
 
         File ruta = new File(entrada);
 
@@ -30,12 +25,7 @@ public class InventarioArchivos {
             return;
         }
 
-        // 2 contadores, Ficheros - Directorios
-        // Paso el contador a la otra funcion pora modificarlas
-        // El contador cuenta también los subdirectorios
         int[] contadores = {0, 0}; 
-        
-
         explorarDirectorio(ruta, contadores);
 
         // Una vez termina la función imprimo por pantalla el total

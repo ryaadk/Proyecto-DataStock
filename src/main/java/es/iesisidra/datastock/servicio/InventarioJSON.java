@@ -144,27 +144,15 @@ public class InventarioJSON {
             return;
         }
         
-        File directorio = fichero.getAbsoluteFile().getParentFile();
-
-        // Comprobar si existe el directorio
-        if (directorio == null || !directorio.exists() || !directorio.isDirectory()) {
-            System.out.println("[ERROR] El directorio de destino no existe.");
+       if (!Util.validarDestino(fichero)) {
             return;
         }
 
-        // Comprobar si el valor de fichero es un directorio.
-        if (fichero.isDirectory()) {
-            System.out.println("[ERROR] La ruta indicada corresponde a un directorio, no a un archivo.");
+        if (!Util.confirmarSobrescritura(fichero)) {
+            System.out.println("Guardado cancelado.");
             return;
         }
-
-        // Comprobar si el fichero ya existe
-        if (fichero.exists()) {
-            if (!Util.confirmar("El fichero ya existe. ¿Quieres sobrescribirlo?")) {
-                System.out.println("Exportación cancelada.");
-                return;
-            }
-        }
+        
         escribirJson(fichero, productos);     
     }
 

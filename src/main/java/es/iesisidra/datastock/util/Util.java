@@ -100,6 +100,35 @@ public final class Util {
         return fichero;
     }
 
+    public static boolean validarDestino(File fichero) {
+
+        File directorio = fichero.getAbsoluteFile().getParentFile();
+
+        // Comprobar si existe el directorio
+        if (directorio == null || !directorio.exists() || !directorio.isDirectory()) {
+            System.out.println("[ERROR] El directorio de destino no existe.");
+            return false;
+        }
+
+        // Comprobar si la ruta es un directorio
+        if (fichero.isDirectory()) {
+            System.out.println("[ERROR] La ruta indicada corresponde a un directorio, no a un archivo.");
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean confirmarSobrescritura(File fichero) {
+        if (fichero.exists()) {
+            if (!confirmar("El fichero ya existe. ¿Quieres sobrescribirlo?")) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /** Detiene el menú hasta que el usuario pulse Intro. */
     public static void pausar() { leerTexto("Pulsa Intro para continuar..."); }
 }
