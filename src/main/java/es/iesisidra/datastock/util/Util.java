@@ -1,6 +1,7 @@
 package es.iesisidra.datastock.util;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Scanner;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Scanner;
  * {@code nextInt()} y {@code nextLine()}.</p>
  */
 public final class Util {
-    private static final Scanner TECLADO = new Scanner(System.in);
+    private static final Scanner TECLADO = new Scanner(System.in, System.console() != null ? System.console().charset() : Charset.defaultCharset());
 
     private Util() {
     }

@@ -13,6 +13,11 @@
   <dependencies>
     <!-- Para RF-FIC-02 y RF-FIC-05. Se facilita la dependencia, NO la solución. -->
     <dependency><groupId>com.google.code.gson</groupId><artifactId>gson</artifactId><version>${gson.version}</version></dependency>
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>9.5.0</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

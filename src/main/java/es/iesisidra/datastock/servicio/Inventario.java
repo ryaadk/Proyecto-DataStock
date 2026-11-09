@@ -88,4 +88,52 @@ public class Inventario {
     public void eliminarProveedor() {
         GestorProveedores.eliminarProveedor();
     }
+
+    public void altaProducto() {
+        GestorProductos.altaProducto();
+    }
+
+    public void consultarProducto() {
+        GestorProductos.consultarProducto();
+    }
+
+    public void modificarProducto() {
+        GestorProductos.modificarProducto();
+    }
+
+    public void eliminarProducto() {
+        GestorProductos.eliminarProducto();
+    }
+
+    public void listarProductosBD() {
+        GestorProductos.listarProductosBD();
+    }
+
+    public void buscarProductoPorNombreBD() {
+        GestorProductos.buscarProductoPorNombreBD();
+    }
+
+    public void productosStockBajoBD() {
+        GestorProductos.productosStockBajoBD();
+    }
+
+    public void registrarMovimiento() {
+        GestorMovimientos.registrarMovimiento();
+    }
+
+    public void consultarTodosMovimientos() {
+        GestorMovimientos.consultarTodosMovimientos();
+    }
+
+    public void consultarMovimientosPorProducto() {
+        GestorMovimientos.consultarMovimientosPorProducto();
+    }
+
+    public void importarProductosMemoriaBD() {
+        GestorProductos.importarProductosMemoriaBD(PRODUCTOS);
+    }
+
+    public void demostrarTransaccionBD() {
+        GestorBD.demostrarTransaccionBD();
+    }
 }

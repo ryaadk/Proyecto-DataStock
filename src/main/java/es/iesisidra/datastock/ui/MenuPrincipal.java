@@ -62,7 +62,6 @@ public class MenuPrincipal {
             System.out.println("1. Listar todos los productos");
             System.out.println("2. Buscar producto por código");
             System.out.println("3. Buscar productos por nombre");
-            System.out.println("4. Consultar productos con stock inferior a un umbral");
             System.out.println("0. Volver al menú principal");
             opcion = Util.leerOpcion("Selecciona una opción: ", 0, 4);
             switch (opcion) {
@@ -120,19 +119,23 @@ public class MenuPrincipal {
             System.out.println("2. Gestionar categorías");
             System.out.println("3. Gestionar proveedores");
             System.out.println("4. Gestionar productos (CRUD)");
-            System.out.println("5. Registrar entrada o salida de stock");
-            System.out.println("6. Consultar historial de movimientos");
-            System.out.println("7. Importar productos de memoria a MySQL");
-            System.out.println("8. Demostración de transacción con commit/rollback");
+            System.out.println("5. Consultas productos");
+            System.out.println("6. Registrar entrada o salida de stock");
+            System.out.println("7. Consultar historial de movimientos");
+            System.out.println("8. Importar productos de memoria a MySQL");
+            System.out.println("9. Demostración de transacción con commit/rollback");
             System.out.println("0. Volver al menú principal");
-            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 8);
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 9);
             switch (opcion) {
                 case 1 -> inventario.comprobarConexion();
                 case 2 -> menuCategorias();
                 case 3 -> menuProveedores();
                 case 4 -> menuProductos();
-                case 5 -> menuMovimientos();
-                case 6 -> menuHisorial();
+                case 5 -> menuConsultasSQL();
+                case 6 -> inventario.registrarMovimiento();
+                case 7 -> menuHisorial();
+                case 8 -> inventario.importarProductosMemoriaBD();
+                case 9 -> inventario.demostrarTransaccionBD();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -173,8 +176,10 @@ public class MenuPrincipal {
             System.out.println("0. Volver al menú MySQL");
             opcion = Util.leerOpcion("Selecciona una opción: ", 0, 4);
             switch (opcion) {
-                case 1 -> inventario.guardarInventario();
-                case 2 -> inventario.recuperarInventario();
+                case 1 -> inventario.altaProveedor();
+                case 2 -> inventario.listarProveedores();
+                case 3 -> inventario.modificarProveedor();
+                case 4 -> inventario.eliminarProveedor();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -193,26 +198,32 @@ public class MenuPrincipal {
             System.out.println("0. Volver al menú MySQL");
             opcion = Util.leerOpcion("Selecciona una opción: ", 0, 4);
             switch (opcion) {
-                case 1 -> inventario.guardarInventario();
-                case 2 -> inventario.recuperarInventario();
+                case 1 -> inventario.altaProducto();
+                case 2 -> inventario.consultarProducto();
+                case 3 -> inventario.modificarProducto();
+                case 4 -> inventario.eliminarProducto();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
         } while (opcion != 0);
     }
 
-    private void menuMovimientos() {
+    private void menuConsultasSQL() {
         int opcion;
 
         do {
-            System.out.println("\n---------- GESTIÓN MOVIMIENTOS ----------");
-            System.out.println("1. Registrar una ENTRADA de stock");
-            System.out.println("2. Registrar una SALIDA de stock");
-            System.out.println("0. Volver al menú MySQL");
-            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 2);
+            System.out.println("\n---------- CONSULTA MYSQL ----------");
+            System.out.println("1. Listar todos los productos");
+            System.out.println("2. Buscar producto por código");
+            System.out.println("3. Buscar productos por nombre");
+            System.out.println("4. Consultar productos con stock bajo");
+            System.out.println("0. Volver al menú principal");
+            opcion = Util.leerOpcion("Selecciona una opción: ", 0, 4);
             switch (opcion) {
-                case 1 -> inventario.guardarInventario();
-                case 2 -> inventario.recuperarInventario();
+                case 1 -> inventario.listarProductosBD();
+                case 2 -> inventario.consultarProducto();
+                case 3 -> inventario.buscarProductoPorNombreBD();
+                case 4 -> inventario.productosStockBajoBD();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
@@ -229,8 +240,8 @@ public class MenuPrincipal {
             System.out.println("0. Volver al menú MySQL");
             opcion = Util.leerOpcion("Selecciona una opción: ", 0, 2);
             switch (opcion) {
-                case 1 -> inventario.guardarInventario();
-                case 2 -> inventario.recuperarInventario();
+                case 1 -> inventario.consultarTodosMovimientos();
+                case 2 -> inventario.consultarMovimientosPorProducto();
                 case 0 -> { }
                 default -> throw new IllegalStateException("Opción inesperada");
             }
