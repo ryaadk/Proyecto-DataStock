@@ -8,6 +8,9 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 
+# Base de datos de demostración
+datos/sqlite/*.db
+
 # Java: archivos compilados
 *.class
 *.jar

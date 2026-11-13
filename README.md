@@ -1,10 +1,10 @@
-# DataStock – Gestión de inventario (UT1 + UT2)
+# **DataStock – Gestión de inventario (UT1 + UT2)**
 
 **Módulo:** Acceso a Datos · 2.º DAM · IES Isidra de Guzmán · 2026–2027  
-**Tecnologías:** Java 21 · Maven · Gson · JDBC · MySQL  
+**Tecnologías:** Java 21 · Maven · Gson · JDBC · MySQL · SQLite (demo)  
 **Repositorio:** https://github.com/ryaadk/Proyecto-DataStock
 
-## 1. Descripción
+## **1. Descripción**
 
 DataStock es una aplicación de consola para gestionar un inventario de productos.
 
@@ -16,7 +16,9 @@ El proyecto comprende dos unidades de trabajo:
 El inventario en memoria y la base de datos son independientes. Los productos se importan
 de UT1 a MySQL únicamente cuando el usuario selecciona esa operación.
 
-## 2. Requisitos
+SQLite se utiliza solo en una actividad complementaria independiente; la aplicación principal sigue utilizando MySQL.
+
+## **2. Requisitos**
 
 - JDK 21.
 - Maven.
@@ -31,7 +33,7 @@ java -version
 mvn -version
 ```
 
-## 3. Instalación y ejecución
+## **3. Instalación y ejecución**
 
 Clonar el repositorio:
 
@@ -47,16 +49,17 @@ mvn clean compile
 mvn exec:java
 ```
 
-Las actividades complementarias de UT1 se pueden ejecutar por separado:
+Las actividades complementarias se pueden ejecutar por separado:
 
 ```bash
 mvn exec:java -Dexec.mainClass=es.iesisidra.datastock.complementarias.XPathActividad
 mvn exec:java -Dexec.mainClass=es.iesisidra.datastock.complementarias.AccesoAleatorioActividad
+mvn exec:java -Dexec.mainClass=es.iesisidra.datastock.complementarias.DemoSQLite
 ```
 
 En PowerShell puede ser necesario poner entre comillas los argumentos `-D`.
 
-## 4. Configuración de MySQL
+## **4. Configuración de MySQL**
 
 Para utilizar UT2:
 
@@ -86,9 +89,9 @@ Dependencia JDBC de MySQL en `pom.xml`:
 </dependency>
 ```
 
-**Nota:** La UT1 puede ejecutarse sin MySQL.
+**Nota:** La UT1 y la demostración SQLite pueden ejecutarse sin MySQL.
 
-## 5. Organización del proyecto
+## **5. Organización del proyecto**
 
 ```text
 Proyecto-DataStock/
@@ -97,7 +100,9 @@ Proyecto-DataStock/
 ├── .gitignore
 ├── datos/
 │   ├── ejemplos/
-│   └── salidas/
+│   ├── salidas/
+│   └── sqlite/                (se crea al ejecutar la demo)
+│       └── productos_demo.db
 ├── material_referencia/
 │   └── DataStock_BD_MySQL.sql
 └── src/main/
@@ -110,6 +115,7 @@ Proyecto-DataStock/
     │   ├── util/
     │   ├── config/
     │   └── complementarias/
+    │       └── DemoSQLite.java
     └── resources/
         └── database.properties
 ```
@@ -117,7 +123,7 @@ Proyecto-DataStock/
 `App` inicia el programa, los menús gestionan la navegación y las clases de servicio
 realizan las operaciones sobre ficheros o base de datos.
 
-## 6. Funcionalidades de UT1
+## **6. Funcionalidades de UT1**
 
 | Requisito | Funcionalidad |
 |---|---|
@@ -133,7 +139,7 @@ realizan las operaciones sobre ficheros o base de datos.
 Las importaciones validan los productos y notifican los registros rechazados.
 La recuperación desde `.dat` sustituye el inventario, previa confirmación cuando corresponde.
 
-## 7. Funcionalidades de UT2
+## **7. Funcionalidades de UT2**
 
 | Requisito | Funcionalidad |
 |---|---|
@@ -146,7 +152,7 @@ La recuperación desde `.dat` sustituye el inventario, previa confirmación cuan
 | RF-JDBC-07 | Importar productos de memoria a MySQL. |
 | RF-JDBC-08 | Demostrar transacciones con `commit` y `rollback`. |
 
-### Base de datos
+### **Base de datos**
 
 MySQL utiliza cuatro tablas:
 
@@ -157,7 +163,7 @@ MySQL utiliza cuatro tablas:
 | `producto` | Código, nombre, precio, stock y referencias. |
 | `movimiento_stock` | Entradas, salidas e historial de existencias. |
 
-### Movimientos e integridad
+### **Movimientos e integridad**
 
 - Los movimientos se registran mediante el procedimiento `registrar_movimiento`.
 - Una entrada aumenta el stock y una salida lo disminuye.
@@ -168,7 +174,7 @@ MySQL utiliza cuatro tablas:
   foránea `fk_mov_producto` protege su historial. MySQL devuelve el error `1451`,
   que la aplicación debe comunicar con un mensaje comprensible.
 
-### Transacciones
+### **Transacciones**
 
 La importación desde memoria utiliza una transacción JDBC: confirma las inserciones
 con `commit()` o las revierte con `rollback()` ante un fallo SQL inesperado.
@@ -176,7 +182,7 @@ con `commit()` o las revierte con `rollback()` ante un fallo SQL inesperado.
 La demostración de transacciones inserta categorías de prueba y comprueba que una
 segunda operación fallida por duplicado no deja inserciones parciales.
 
-## 8. Validaciones y errores
+## **8. Validaciones y errores**
 
 Los productos deben cumplir estas reglas:
 
@@ -190,22 +196,37 @@ La aplicación valida las entradas, solicita confirmación antes de borrar y mue
 mensajes `[OK]`, `[ERROR]` y `[AVISO]`. Las consultas SQL utilizan sentencias
 preparadas y los recursos JDBC se cierran al terminar.
 
-## 9. Comparativa MySQL y SQLite
+## **9. Comparativa MySQL y SQLite**
 
 | Aspecto | MySQL | SQLite |
 |---|---|---|
-| ¿Necesita servidor? | Sí, un servidor MySQL. | No, funciona integrado en la aplicación. |
-| ¿Dónde guarda los datos? | En archivos gestionados por el servidor. | En un fichero local, normalmente `.db`. |
-| Conexión JDBC | `jdbc:mysql://localhost:3306/datastock` | `jdbc:sqlite:datastock.db` |
-| Dependencia Maven | `com.mysql:mysql-connector-j` | `org.xerial:sqlite-jdbc` |
-| Ventajas | Multiusuario, escalable y adecuado para servicios en red. | Ligero, sencillo y sin instalación de servidor. |
-| Inconvenientes | Requiere instalación, configuración y administración. | Menor capacidad para muchas escrituras simultáneas. |
-| ¿Cuándo elegirlo? | Aplicaciones empresariales, web o con varios usuarios. | Aplicaciones locales, pequeñas o prototipos. |
+| ¿Necesita servidor? | Sí, requiere un servidor MySQL. | No, está integrado en la aplicación. |
+| ¿Dónde guarda los datos? | En archivos administrados por el servidor. | En un fichero local `.db`. |
+| Conexión JDBC | `jdbc:mysql://localhost:3306/datastock` | `jdbc:sqlite:datos/sqlite/productos_demo.db` |
+| Dependencia Maven | `com.mysql:mysql-connector-j:9.5.0` | `org.xerial:sqlite-jdbc:3.46.1.0` |
+| Ventajas | Multiusuario, escalable y adecuado para servicios en red. | Ligero, sencillo y sin servidor. |
+| Inconvenientes | Requiere instalación, configuración y administración. | Tiene limitaciones con muchas escrituras simultáneas. |
+| ¿Cuándo elegirlo? | Aplicaciones empresariales, web o multiusuario. | Aplicaciones locales, pequeñas o prototipos. |
 
-### Pool de conexiones
+### **Demostración SQLite**
 
-Un **pool de conexiones** mantiene un conjunto de conexiones JDBC disponibles
-para reutilizarlas, evitando abrir una conexión nueva en cada operación.
+`DemoSQLite` es una clase ejecutable independiente de DataStock. Utiliza el controlador
+JDBC **`org.xerial:sqlite-jdbc:3.46.1.0`**, añadido al `pom.xml`.
+
+- Crea `datos/sqlite/` y abre `productos_demo.db` mediante `DriverManager`.
+- Crea la tabla `producto_demo` con los campos `codigo` y `nombre`.
+- Inserta `SQL-001` y `SQL-002` mediante `PreparedStatement` e `INSERT OR IGNORE`.
+- Muestra los registros ordenados por código mediante `ResultSet`.
+- Usa `try-with-resources` para cerrar los recursos JDBC.
+- Si se ejecuta de nuevo, no duplica los registros y el fichero `.db` conserva los datos.
+
+La base de datos de demostración no sustituye las cuatro tablas MySQL ni se integra en los menús.
+Se recomienda excluir `datos/sqlite/*.db` en `.gitignore` si contiene resultados personales.
+
+### **Pool de conexiones**
+
+Un **pool de conexiones** mantiene un conjunto de conexiones JDBC disponibles para
+reutilizarlas sin abrir una conexión nueva en cada operación.
 
 Resulta útil en aplicaciones con muchos usuarios o consultas frecuentes, como
 servidores web. **DataStock es una aplicación de consola**, con operaciones
@@ -213,7 +234,7 @@ puntuales y normalmente secuenciales, por lo que puede trabajar sin pool:
 abre una conexión cuando la necesita y la cierra correctamente mediante
 `try-with-resources` al finalizar.
 
-## 10. Pruebas y entrega
+## **10. Pruebas y entrega**
 
 Las pruebas deben registrar los datos introducidos, el resultado esperado,
 el resultado obtenido y las incidencias detectadas.
@@ -226,10 +247,15 @@ Antes de entregar, comprobar que:
 - Las operaciones CRUD respetan las claves foráneas.
 - Los movimientos actualizan el stock y conservan el historial.
 - `commit()` y `rollback()` funcionan según los casos de prueba.
+- `DemoSQLite` funciona sin MySQL, crea el fichero `.db` y evita duplicados al repetirse.
 - No se suben `target/`, credenciales ni configuraciones privadas.
 - Se incluye el registro de pruebas y la etiqueta Git de entrega.
 
-## 11. Referencias
+## **11. Referencias**
 
 Los enunciados de **DataStock UT1 y UT2** facilitados en el aula virtual
 son la referencia principal para los requisitos y casos de aceptación.
+
+- [SQLite: descargas](https://www.sqlite.org/download.html)
+- [SQLite: guía de inicio](https://www.sqlite.org/quickstart.html)
+- [SQLite JDBC de Xerial](https://github.com/xerial/sqlite-jdbc)
