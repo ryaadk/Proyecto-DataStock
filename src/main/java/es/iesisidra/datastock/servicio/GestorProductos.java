@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import es.iesisidra.datastock.componentes.ConsultaProductoJdbc;
 import es.iesisidra.datastock.config.ConexionConfig;
 import es.iesisidra.datastock.modelo.Producto;
 import es.iesisidra.datastock.modelo.ProductoConsultaDTO;
@@ -180,39 +181,19 @@ public class GestorProductos {
             return;
         }
 
-        String sql = "SELECT p.codigo, p.nombre, p.precio, p.stock, "
-                + "p.categoria_id, c.nombre AS categoria, "
-                + "p.proveedor_id, pr.nombre AS proveedor "
-                + "FROM producto p "
-                + "JOIN categoria c ON p.categoria_id = c.id "
-                + "JOIN proveedor pr ON p.proveedor_id = pr.id "
-                + "WHERE p.codigo = ?";
+        try {
+            ConsultaProductoJdbc consulta = new ConsultaProductoJdbc();
+            ProductoConsultaDTO producto = consulta.buscarPorCodigo(codigo);
 
-        try (Connection conexion = ConexionConfig.conectar();
-            PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+            if (producto != null) {
+                System.out.println("\n--- DATOS DEL PRODUCTO ---");
+                System.out.println("----------------------------------------");
+                System.out.println(producto);
+                System.out.println("----------------------------------------");
+                System.out.println(ColoresConsola.pintar("[OK] Producto encontrado.", ColoresConsola.VERDE));
 
-            sentencia.setString(1, codigo);
-
-            try (ResultSet resultado = sentencia.executeQuery()) {
-
-                if (resultado.next()) {
-                    System.out.println("\n--- DATOS DEL PRODUCTO ---");
-                    System.out.println("----------------------------------------");
-
-                    System.out.println("Código: " + resultado.getString("codigo"));
-                    System.out.println("Nombre: " + resultado.getString("nombre"));
-                    System.out.println("Precio: " + resultado.getBigDecimal("precio") + " \\u20AC");
-                    System.out.println("Stock: " + resultado.getInt("stock"));
-
-                    System.out.println("Categoría: "+ resultado.getInt("categoria_id") + " - " + resultado.getString("categoria"));
-
-                    System.out.println("Proveedor: " + resultado.getInt("proveedor_id") + " - " + resultado.getString("proveedor"));
-                    System.out.println("----------------------------------------");
-
-                } else {
-
-                    System.out.println(ColoresConsola.pintar("[AVISO] No existe ningún producto con ese código.", ColoresConsola.AMARILLO));
-                }
+            } else {
+                System.out.println(ColoresConsola.pintar("[AVISO] No existe ningún producto con ese código.", ColoresConsola.AMARILLO));
             }
 
         } catch (SQLException e) {

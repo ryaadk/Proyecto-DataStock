@@ -1,4 +1,4 @@
-# **DataStock – Gestión de inventario (UT1 + UT2)**
+# **DataStock – Gestión de inventario (UT1 + UT2 + UT3)**
 
 **Módulo:** Acceso a Datos · 2.º DAM · IES Isidra de Guzmán · 2026–2027  
 **Tecnologías:** Java 21 · Maven · Gson · JDBC · MySQL · SQLite (demo)  
@@ -108,6 +108,7 @@ Proyecto-DataStock/
 └── src/main/
     ├── java/es/iesisidra/datastock/
     │   ├── App.java
+    │   ├── componentes/       (UT3: LectorProductosJson y ConsultaProductoJdbc)
     │   ├── modelo/
     │   ├── servicio/
     │   ├── repository/
@@ -251,7 +252,61 @@ Antes de entregar, comprobar que:
 - No se suben `target/`, credenciales ni configuraciones privadas.
 - Se incluye el registro de pruebas y la etiqueta Git de entrega.
 
-## **11. Referencias**
+## **11. UT3: componentes reutilizables**
+
+En la UT3 se han sacado dos operaciones a componentes reutilizables, dentro del
+paquete `es.iesisidra.datastock.componentes`. El resto de la aplicación no cambia.
+
+| Componente | Entrada | Salida | Errores |
+|---|---|---|---|
+| `LectorProductosJson` | Ruta del fichero (`Path`) y productos ya existentes (solo para detectar duplicados). | `List<Producto>` con los productos válidos. Las incidencias se consultan con `getIncidencias()`. | Lanza `IOException` si el fichero no existe, el JSON está mal formado o no tiene el array `productos`. |
+| `ConsultaProductoJdbc` | Código del producto. | `ProductoConsultaDTO` con los datos del producto, o `null` si no existe. | Lanza `SQLException` si falla MySQL o `IllegalStateException` si falta la configuración. |
+
+Ninguno de los dos componentes escribe por consola ni usa `Scanner`. Los menús piden
+los datos, llaman al componente y muestran el resultado: `[OK]` en verde, `[ERROR]` en
+rojo y `[AVISO]` en amarillo.
+
+**¿Qué ventaja tiene separar la lectura JSON del menú? ¿Qué inconveniente tiene?**
+La lectura del fichero ya no depende de la consola, así que se puede reutilizar desde
+otra aplicación, desde otro menú o desde una prueba sin tener que escribir nada por
+teclado. Además, cada clase tiene una sola responsabilidad y es más fácil encontrar
+un fallo. El inconveniente es que hay más clases y más código para pasar los datos de
+un sitio a otro (por ejemplo, las incidencias), y para un proyecto pequeño puede
+parecer más complicado que tenerlo todo junto.
+
+**¿Por qué conviene separar una consulta JDBC de la presentación por consola?**
+Porque así la consulta solo se encarga de abrir la conexión, ejecutar el
+`PreparedStatement`, leer el `ResultSet` y cerrar los recursos. Si mañana los datos
+se muestran en una ventana o en una web, la consulta sirve igual. También se puede
+probar el componente comprobando el objeto devuelto, sin mirar lo que sale por pantalla.
+
+**¿Qué herramientas he utilizado?**
+
+- **IDE (VS Code):** escribir, compilar y depurar el código.
+- **Maven:** gestionar las dependencias (Gson y MySQL Connector/J), compilar y ejecutar el proyecto.
+- **Javadoc:** documentar las clases y los métodos públicos de los componentes
+  (finalidad, parámetros, resultado y errores). Se puede generar con `mvn javadoc:javadoc`.
+- **JUnit:** no se ha usado en esta entrega; las pruebas se han hecho de forma manual desde el menú.
+
+**¿Qué dos opciones de DataStock se han modificado?**
+
+- **Menú principal > 2. Importar productos desde JSON:** ahora llama a
+  `LectorProductosJson` y añade al inventario los productos que devuelve.
+- **7. Gestionar base de datos MySQL > 5. Consultas productos > 2. Buscar producto por código:**
+  ahora llama a `ConsultaProductoJdbc` y muestra la ficha o un aviso.
+
+### **Registro de pruebas UT3**
+
+| Caso | Datos utilizados | Resultado esperado | Resultado obtenido | Estado |
+|---|---|---|---|---|
+| CP-COMP-01 | Opción 2 con `datos/ejemplos/catalogo_valido.json`. | Se cargan los productos válidos y se muestra `[OK]`. | Encontrados 2, importados 2, sin incidencias. `[OK] Importación finalizada.` en verde. | Superada |
+| CP-COMP-02 | Opción 2 con `datos/ejemplos/catalogo_malformado.json` y con `datos/ejemplos/no_existe.json`. | Error controlado en rojo; DataStock sigue funcionando. | `[ERROR] JSON mal formado.` y `[ERROR] El fichero no existe o no es un fichero` en rojo. Vuelve al menú principal. | Superada |
+| CP-COMP-03 | Opción 7 > 5 > 2 con `TEC-001` (existe) y `NOEXISTE-99` (no existe). | Se muestra la ficha correcta o un aviso; sin excepciones. | Ficha de `TEC-001` con `[OK] Producto encontrado.`; para `NOEXISTE-99`, `[AVISO] No existe ningún producto con ese código.` | Superada |
+
+Prueba adicional: con `datos/ejemplos/catalogo_con_errores.json` se importa 1 producto y se
+rechazan 2 (precio negativo y código duplicado), igual que antes de la refactorización.
+
+## **12. Referencias**
 
 Los enunciados de **DataStock UT1 y UT2** facilitados en el aula virtual
 son la referencia principal para los requisitos y casos de aceptación.
